@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forest Focus</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Inter:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --mint: #B7E5B4;
+      --moss: #A0C49D;
+      --warm-cream: #FAF3DD;
+      --background: #F7F6F2;
+      --shadow: #94B49F;
+      --text: #333;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+      margin: 0;
+    }
+
+    .night-mode {
+      background: linear-gradient(to bottom, #1a3c34, #2e4b47);
+      color: var(--warm-cream);
+      --text: var(--warm-cream);
+      --background: #2e4b47;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .logo {
+      width: 100px;
+      margin: 1rem auto;
+    }
+
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem;
+      color: var(--moss);
+      margin-bottom: 1rem;
+    }
+
+    .neumorphic {
+      background: var(--background);
+      border-radius: 1rem;
+      box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.5);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .night-mode .neumorphic {
+      background: #2e4b47;
+      box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.3), -8px -8px 16px rgba(255, 255, 257, 0.1);
+    }
+
+    .timer {
+      font-size: 2.5rem;
+      font-family: 'Poppins', sans-serif;
+      color: var(--mint);
+      margin: 1rem 0;
+    }
+
+    .tree {
+      width: 150px;
+      height: 150px;
+      margin: 1rem auto;
+      transition: transform 0.5s ease, filter 0.5s ease;
+    }
+
+    .tree.dull {
+      filter: grayscale(100%) brightness(70%);
+    }
+
+    .tree.vibrant {
+      filter: grayscale(0%) brightness(110%);
+    }
+
+    .quote {
+      font-style: italic;
+      color: var(--shadow);
+      margin: 1rem 0;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .button {
+      background: linear-gradient(145deg, var(--mint), var(--moss));
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 2rem;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      cursor dépasse: pointer;
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+      margin: 0.5rem;
+      width: 150px;
+      touch-action: manipulation;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--warm-cream);
+      padding: 2rem;
+      border-radius: 1rem;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .night-mode .modal-content {
+      background: #3b5e56;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.9rem;
+    }
+
+    .toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--moss);
+      color: white;
+      border-radius: 2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    audio {
+      display: none;
+    }
+
+    .name-input {
+      margin: 1rem 0;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--shadow);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+    }
+
+    .personalized-message {
+      font-size: 1rem;
+      color: var(--moss);
+      margin: 0.5rem 0;
+    }
+
+    .tree-log {
+      margin-top: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      background: var(--warm-cream);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transition: background 0.3s ease;
+    }
+
+    .night-mode .tree-log {
+      background: #3b5e56;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .tree-log::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .tree-log::-webkit-scrollbar-track {
+      background: var(--warm-cream);
+      border-radius: 4px;
+    }
+
+    .night-mode .tree-log::-webkit-scrollbar-track {
+      background: #3b5e56;
+    }
+
+    .tree-log::-webkit-scrollbar-thumb {
+      background: var(--moss);
+      border-radius: 4px;
+    }
+
+    .night-mode .tree-log::-webkit-scrollbar-thumb {
+      background: #5a7d5a;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2.5rem;
+      margin: 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.75rem;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--shadow);
+      z-index: 1;
+    }
+
+    .night-mode .timeline::before {
+      background: #5a7d5a;
+    }
+
+    .timeline-entry {
+      position: relative;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .timeline-entry.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .night-mode .timeline-entry {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline-entry::before {
+      content: '';
+      position: absolute;
+      left: -2.25rem;
+      top: 0.75rem;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--moss);
+      z-index: 2;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline-entry.start::before {
+      background: #28a745;
+    }
+
+    .timeline-entry.give-up::before {
+      background: #dc3545;
+    }
+
+    .timeline-entry.finish::before {
+      background: #17a2b8;
+    }
+
+    .timeline-entry .icon {
+      position: absolute;
+      left: -2.75rem;
+      top: 0.5rem;
+      font-size: 1.2rem;
+      color: var(--moss);
+      z-index: 2;
+    }
+
+    .timeline-entry.start .icon {
+      color: #28a745;
+    }
+
+    .timeline-entry.give-up .icon {
+      color: #dc3545;
+    }
+
+    .timeline-entry.finish .icon {
+      color: #17a2b8;
+    }
+
+    .timeline-entry .timestamp {
+      font-size: 0.85rem;
+      color: var(--shadow);
+      margin-bottom: 0.3rem;
+      font-weight: 500;
+    }
+
+    .night-mode .timeline-entry .timestamp {
+      color: #a0c4a0;
+    }
+
+    .timeline-entry .action {
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 0.5rem; }
+      .timer { font-size: 2rem; }
+      .tree { width: 120px; height: 120px; }
+      .button { width: 120px; padding: 0.5rem 1rem; }
+      .tree-log {
+        max-height: 150px;
+        padding: 0.75rem;
+      }
+      .timeline {
+        padding-left: 2rem;
+      }
+      .timeline-entry {
+        padding: 0.4rem;
+      }
+      .timeline-entry::before {
+        left: -2rem;
+        width: 12px;
+        height: 12px;
+      }
+      .timeline-entry .icon {
+        left: -2.5rem;
+        font-size: 1rem;
+      }
+      .timeline-entry .timestamp {
+        font-size: 0.8rem;
+      }
+      .timeline-entry .action {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Logo -->
+    <img class="logo" src="https://i.pinimg.com/736x/7a/94/3d/7a943dc3c23a6c6f8ce5547758c2d78b.jpg" alt="Forest Focus Logo">
+
+    <h1>Forest Focus 🌱</h1>
+    <p>Stay focused to grow your forest</p>
+
+    <!-- Name Input -->
+    <input type="text" id="userName" class="name-input" placeholder="Enter your name" maxlength="20">
+    <div id="personalizedMessage" class="personalized-message"></div>
+
+    <!-- Timer Section -->
+    <div class="neumorphic">
+      <div class="timer" id="timer">25:00</div>
+      <img id="tree" class="tree" src="https://i.pinimg.com/736x/02/4a/75/024a75806c6fb5d275d6051acc2e1bb7.jpg" alt="Tree">
+      <div class="buttons">
+        <button class="button" id="start">Start</button>
+        <button class="button" id="pause" disabled>Pause</button>
+        <button class="button" id="giveUp">Give Up</button>
+      </div>
+    </div>
+
+    <!-- Quote Section -->
+    <div class="quote" id="quote">"Stay focused and watch your dreams grow."</div>
+
+    <!-- Stats Section -->
+    <div class="neumorphic stats">
+      <div>Trees: <span id="trees">0</span></div>
+      <div>Streak: <span id="streak">0</span> days</div>
+    </div>
+    <div class="neumorphic tree-log" id="treeLog">
+      <div class="timeline" id="timeline"></div>
+    </div>
+    <button class="button" id="resetTrees">Reset Trees</button>
+
+    <!-- Night Mode Toggle -->
+    <button class="toggle" id="nightMode">Night Mode</button>
+
+    <!-- Music Toggle -->
+    <button class="toggle" id="musicToggle" style="right: 8rem;">Music</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2>Well done!</h2>
+      <p>Another tree added to your forest! 🌳</p>
+      <button class="button" id="closeModal">Continue</button>
+    </div>
+  </div>
+
+  <audio id="forestSound" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-slowmotion.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // LocalStorage Functions
+    function getStats() {
+      return {
+        trees: parseInt(localStorage.getItem('trees') || '0'),
+        streak: parseInt(localStorage.getItem('streak') || '0'),
+        lastDate: localStorage.getItem('lastDate') || '',
+        treeLog: JSON.parse(localStorage.getItem('treeLog') || '[]')
+      };
+    }
+
+    function saveStats(trees, streak, lastDate, treeLog) {
+      localStorage.setItem('trees', trees);
+      localStorage.setItem('streak', streak);
+      localStorage.setItem('lastDate', lastDate);
+      localStorage.setItem('treeLog', JSON.stringify(treeLog));
+    }
+
+    // Initialize Stats
+    let stats = getStats();
+    document.getElementById('trees').textContent = stats.trees;
+    document.getElementById('streak').textContent = stats.streak;
+    const timelineElement = document.getElementById('timeline');
+    updateTreeLogUI();
+
+    // Timer Logic
+    const timerDisplay = document.getElementById('timer');
+    const tree = document.getElementById('tree');
+    const startBtn = document.getElementById('start');
+    const pauseBtn = document.getElementById('pause');
+    const giveUpBtn = document.getElementById('giveUp');
+    const resetTreesBtn = document.getElementById('resetTrees');
+    const userNameInput = document.getElementById('userName');
+    const personalizedMessage = document.getElementById('personalizedMessage');
+    let timeLeft = 25 * 60;
+    let timer = null;
+    let userName = '';
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      const progress = (25 * 60 - timeLeft) / (25 * 60);
+      tree.style.transform = `scale(${1 + progress * 0.5})`;
+    }
+
+    function logEvent(action) {
+      const timestamp = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+      const icon = action === 'start' ? '▶' : action === 'give-up' ? '⏹' : '✔';
+      const logEntry = `<div class="timeline-entry ${action}"><span class="icon">${icon}</span><div class="timestamp">${timestamp}</div><div class="action">${userName || 'User'} ${action === 'finish' ? 'finished a session' : action === 'start' ? 'started a session' : 'gave up a session'}</div></div>`;
+      stats.treeLog.push(logEntry);
+      if (stats.treeLog.length > 50) stats.treeLog.shift();
+      saveStats(stats.trees, stats.streak, stats.lastDate, stats.treeLog);
+      updateTreeLogUI();
+    }
+
+    function updateTreeLogUI() {
+      timelineElement.innerHTML = stats.treeLog.join('');
+      const entries = timelineElement.querySelectorAll('.timeline-entry');
+      entries.forEach((entry, index) => {
+        setTimeout(() => {
+          entry.classList.add('show');
+        }, index * 100);
+      });
+      const logContainer = timelineElement.parentElement;
+      const isAtBottom = logContainer.scrollHeight - logContainer.scrollTop <= logContainer.clientHeight + 10;
+      if (isAtBottom) {
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+    }
+
+    startBtn.addEventListener('click', () => {
+      userName = userNameInput.value.trim();
+      if (!userName) {
+        alert("Please enter your name to start the countdown!");
+        return;
+      }
+
+      if (!timer) {
+        timer = setInterval(() => {
+          timeLeft--;
+          updateTimerDisplay();
+          personalizedMessage.textContent = `Keep going, ${userName}!`;
+          if (timeLeft <= 0) {
+            clearInterval(timer);
+            timer = null;
+            stats.trees++;
+            updateStreak();
+            saveStats(stats.trees, stats.streak, new Date().toDateString(), stats.treeLog);
+            logEvent("finish");
+            document.getElementById('trees').textContent = stats.trees;
+            document.getElementById('streak').textContent = stats.streak;
+            document.getElementById('modal').style.display = 'flex';
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            giveUpBtn.disabled = true;
+            timeLeft = 25 * 60;
+            updateTimerDisplay();
+            tree.style.transform = 'scale(1)';
+            tree.classList.remove('vibrant');
+            personalizedMessage.textContent = '';
+            updateQuote();
+          }
+        }, 1000);
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        giveUpBtn.disabled = false;
+        tree.classList.remove('dull');
+        tree.classList.add('vibrant');
+        logEvent("start");
+      }
+    });
+
+    pauseBtn.addEventListener('click', () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        personalizedMessage.textContent = '';
+      } else {
+        startBtn.click();
+      }
+    });
+
+    giveUpBtn.addEventListener('click', () => {
+      clearInterval(timer);
+      timer = null;
+      tree.classList.add('dull');
+      logEvent("give-up");
+      setTimeout(() => {
+        timeLeft = 25 * 60;
+        updateTimerDisplay();
+        tree.style.transform = 'scale(1)';
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        giveUpBtn.disabled = true;
+        personalizedMessage.textContent = '';
+        updateQuote();
+      }, 1000);
+    });
+
+    resetTreesBtn.addEventListener('click', () => {
+      stats.trees = 0;
+      stats.treeLog = [];
+      saveStats(stats.trees, stats.streak, stats.lastDate, stats.treeLog);
+      document.getElementById('trees').textContent = stats.trees;
+      updateTreeLogUI();
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.getElementById('modal').style.display = 'none';
+    });
+
+    function updateStreak() {
+      const today = new Date().toDateString();
+      if (stats.lastDate !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (stats.lastDate === yesterday.toDateString()) {
+          stats.streak++;
+        } else {
+          stats.streak = 1;
+        }
+      }
+    }
+
+    const quotes = [
+      "Stay focused and watch your dreams grow.",
+      "Every moment of focus plants a seed for success.",
+      "Grow your forest, one tree at a time."
+    ];
+    let quoteIndex = 0;
+    const quoteElement = document.getElementById('quote');
+
+    function updateQuote() {
+      quoteIndex = (quoteIndex + 1) % quotes.length;
+      quoteElement.style.opacity = 0;
+      setTimeout(() => {
+        quoteElement.textContent = quotes[quoteIndex];
+        quoteElement.style.opacity = 1;
+      }, 500);
+    }
+
+    document.getElementById('nightMode').addEventListener('click', () => {
+      document.body.classList.toggle('night-mode');
+      document.getElementById('nightMode').textContent = document.body.classList.contains('night-mode') ? 'Day Mode' : 'Night Mode';
+    });
+
+    const audio = document.getElementById('forestSound');
+    document.getElementById('musicToggle').addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        document.getElementById('musicToggle').textContent = 'Mute';
+      } else {
+        audio.pause();
+        document.getElementById('musicToggle').textContent = 'Music';
+      }
+    });
+
+    updateQuote();
+  </script>
+</body>
+</html>
